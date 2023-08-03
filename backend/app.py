@@ -2,14 +2,24 @@ from flask import (
     Flask,
     request,
     make_response,
-    jsonify
+    jsonify,
 )
 from scene import Scene
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 
 # Scene Data
-s = Scene("", [])
+s = Scene("", [], app.logger)
+
+# Set up a rotating file handler for the logger
+handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
+handler.setLevel(logging.INFO)
+app.logger.addHandler(handler)
+
+# Set the log level to INFO
+app.logger.setLevel(logging.INFO)
 
 @app.route('/test', methods=['GET'])
 def test():
@@ -29,7 +39,7 @@ def setup_scene():
             "error_message": "Missing social skill or goals"
         }), 500)
 
-    s = Scene(social_skill, goals)
+    s = Scene(social_skill, goals, app.logger)
 
     s.generate_scene()
 
