@@ -2,11 +2,14 @@ import os
 import openai
 import re
 import random
-openai.api_key = "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"
+import time
+import logging
+from flask import current_app
+openai.api_key = "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"
 
 class Scene:
 
-    def __init__(self, social_skill, goals):
+    def __init__(self, social_skill, goals, logger):
 
         self.social_skill = social_skill
         self.goals = goals 
@@ -27,7 +30,7 @@ class Scene:
         self.scores = []
 
         self.score_totals = {}
-
+        self.logger = logger
         
     def as_dict(self):
         return {
@@ -55,7 +58,7 @@ class Scene:
     def process_conversation(self, messages, aps=False, sot=False):
 
         def tracker_response(message_prompt, temperature=0):
-            openai.api_key = "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"
+            openai.api_key = "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"
             completion = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=message_prompt
@@ -495,9 +498,9 @@ class Scene:
         print("Has Someone Left: ", self.someone_left)
         print("Last Round?: ", self.last_round)
         print("End?: ", self.end)
-
+        
         # End handling
-
+        
         if self.someone_left or "[END]" in self.current_event:
             return ["END", "THE END"], self.characters["Student"]["Role"]
 
@@ -516,8 +519,9 @@ class Scene:
             self.scores.append({
                 "none": ""
             })
-
+        
         elif not user_spoke:
+            
             print("Student didn't speak")
 
             if len(self.past_messages) > 0 and self.past_messages[-1][0] == "Student": # Student should have spoken, but did not.
@@ -531,19 +535,29 @@ class Scene:
                 # Add "..." message and regenerate
 
                 self.past_messages.append(["Student", "..."])
-
+                
+                start_time = time.time()
                 self.update_scene()
+                self.logger.info('Update Scene Student Did Not Speak: %s seconds', time.time() - start_time)
+
+                start_time = time.time()
                 self.generate_conversation()
+                self.logger.info('Generate Conversation Student Did Not Speak: %s seconds', time.time() - start_time)
 
             elif len(self.future_messages) == 0:
                 print("Future window empty")
 
+                start_time = time.time()
                 self.update_scene()
+                self.logger.info('Update Scene Future Window Empty: %s seconds', time.time() - start_time)
+
+                start_time = time.time()
                 self.generate_conversation()
+                self.logger.info('Generate Conversation Future Window Empty: %s seconds', time.time() - start_time)
 
         else: # User speaks
             print("Student speaks")
-
+            
             # Remove inner voice
         
             if len(self.past_messages) > 0 and self.past_messages[-1][0] == "Student":
@@ -575,7 +589,7 @@ class Scene:
                 })
 
             # Track goals
-
+            start_time = time.time()
             score = self.process_conversation(messages, 
                                             aps=self.goals["addressing_prior_statement"] if "addressing_prior_statement" in self.goals else False,
                                             sot=self.goals["staying_on_topic"] if "staying_on_topic" in self.goals else False)
@@ -584,14 +598,17 @@ class Scene:
                 "message": current_window[-1][1],
                 "data": score
             })
-
+            self.logger.info('Goal Tracker User Speaks: %s seconds', time.time() - start_time)
             self.add_score_to_total(score)
             
             # Update Scene
-
+            start_time = time.time()
             self.update_scene()
-            self.generate_conversation()
+            self.logger.info('Update Scene User Speaks: %s seconds', time.time() - start_time)
 
+            start_time = time.time()
+            self.generate_conversation()
+            self.logger.info('Generate Conversation User Speaks: %s seconds', time.time() - start_time)
             # Student should not speak twice in a row
             
             if self.future_messages[0][0] == "Student":

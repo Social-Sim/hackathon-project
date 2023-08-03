@@ -1,0 +1,31 @@
+Exception on /scene/setup [POST]
+Traceback (most recent call last):
+  File "C:\Users\noahh\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\noahh\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\noahh\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\noahh\AppData\Local\Programs\Python\Python311\Lib\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\noahh\Desktop\Python\Main GPT\hackathon-project\backend\app.py", line 47, in setup_scene
+    s = Scene(social_skill, goals)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Scene.__init__() missing 1 required positional argument: 'logger'
+Part 1 execution time: 29.045763731002808 seconds
+Part 1 execution time: 0.0 seconds
+Part 1 execution time: 0.0 seconds
+Part 1 execution time: 0.0 seconds
+Part 1 execution time: 36.101959466934204 seconds
+Part 1 execution time: 27.701982259750366 seconds
+Part 1 execution time: 24.31661367416382 seconds
+Goal Tracker User Speaks: 1.486997365951538 seconds
+Update Scene User Speaks: 22.629307746887207 seconds
+Update Scene User Speaks: 4.543003797531128 seconds
+Goal Tracker User Speaks: 1.0650181770324707 seconds
+Update Scene User Speaks: 22.984469175338745 seconds
+Generate Conversation User Speaks: 3.561103343963623 seconds
